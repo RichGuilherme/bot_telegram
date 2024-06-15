@@ -1,7 +1,8 @@
 import { google } from 'googleapis'
 import { oauth2Client } from './auth-service'
-import fs from 'fs'
-import path from 'path'
+import { formatDate } from '../utils/formatDate'
+import { postTasks } from '../repository/tasks-repository'
+
 
 export const calendarService = {
     Tasks: async (taskListId: string) => {
@@ -16,7 +17,6 @@ export const calendarService = {
 
         const taskLists = res.data.items
 
-        
         if (taskLists && taskLists.length) {
             const currentDate = new Date()
             const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
@@ -26,21 +26,14 @@ export const calendarService = {
                 const taskDate = taskValue.due ? new Date(taskValue.due.split("T")[0]) : null
 
                 return taskDate && taskDate >= firstDayOfMonth && taskDate <= lastDayOfMonth
-            }).map((taskValue) => ({
-                Nome: taskValue.title || "",
-                Tarefa: taskValue.notes || "",
-                Dia: taskValue.due?.split("T")[0]
+            }).map((taskValue, index) => ({
+                id: index,
+                Name: taskValue.title || "",
+                Task: taskValue.notes || "",
+                Day: formatDate(taskValue.due?.split("T")[0] as string),
             }))
 
-            const filePath = path.join(__dirname, '../data/tasks.json')
-
-            fs.writeFile(filePath, JSON.stringify(tasks, null, 2), (err) => {
-                if (err) {
-                    console.error('Error writing to file', err)
-                } else {
-                    console.log('Tasks saved successfully.')
-                }
-            })
+            postTasks(tasks)
 
         } else {
             console.log('No task lists found.')
