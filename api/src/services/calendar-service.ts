@@ -1,7 +1,7 @@
 import { google } from 'googleapis'
 import { oauth2Client } from './auth-service'
 import { formatDate } from '../utils/formatDate'
-import { postTasks } from '../repository/tasks-repository'
+import { TaskRepositories } from '../repository/tasks-repository'
 
 
 export const calendarService = {
@@ -33,7 +33,7 @@ export const calendarService = {
                 Day: formatDate(taskValue.due?.split("T")[0] as string),
             }))
 
-            postTasks(tasks)
+            TaskRepositories.postTasks(tasks)
 
         } else {
             console.log('No task lists found.')
