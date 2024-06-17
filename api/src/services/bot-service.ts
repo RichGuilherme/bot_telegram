@@ -4,74 +4,80 @@ import { TaskRepositories } from "../repository/tasks-repository"
 import { ITask } from "../interfaces/task"
 import { toDate } from "../utils/toDate"
 
-
 const token = process.env.TOKEN_TELEGRAM as string
 const bot = new TelegramBot(token, { polling: true })
 const chatId = process.env.CHATBOT_ID as string
 
-const sendMessageBot = async (day: string, name: string, task: string ): Promise<TelegramBot.Message> => {
-    return await bot.sendMessage(chatId, `Hoje dia ${day}, ficará na projeção ${name} no ${task}`)
+const sendMessageBot = async (name: string, day: string, task: string): Promise<TelegramBot.Message> => {
+    return await bot.sendMessage(chatId, `No próximo culto dia ${day}, ficará na projeção ${name} - ${task}`)
 }
 
-const RuleScheduleJob = (month: number, year: number): schedule.RecurrenceRule => {
+// Essa função serve para criar as regras de agendamento do scheduleJob, retornando um RecurrenceRule.
+const ruleScheduleJob = (month: number, year: number, day: number): schedule.RecurrenceRule => {
     const rule = new schedule.RecurrenceRule()
-    const date = new Date()
+    let date = new Date()
 
     rule.month = month - 1
     rule.year = year
-    rule.dayOfWeek = [0, 3, 5, 6]
-    rule.minute = 33
+    rule.date = day
+    rule.minute = 0
 
-    if (date.getDay() == 6 && date.getHours() > 17) {
-        rule.hour = 20
+    if ((date.getDate() !== day) &&
+        (date.getDay() == 6) && 
+        (date.getHours() < 17)
+    ) {
+        rule.hour = 18
     } else {
-        rule.hour = 17
+        rule.hour = 11
     }
 
     return rule
 }
 
-(async function scheduleMessage() {
-    let name: string;
-    let task: string;
-    let day: string;
-    let mouth: number | undefined;
-    let year: number | undefined;
+const dateClosetsTask = (value: string) => {
+    const date = new Date(toDate(value))
+    let mouth: number;
+    let year: number;
+    let day: number;
 
-    await TaskRepositories.getClosetsTask()
-        .then((value) => {
-            if (!value) {
-                return
-            }
+    mouth = date.getMonth()
+    year = date.getFullYear()
+    day = date.getDate()
 
-            const valueTask = value as ITask
-            name = valueTask.Name
-            task = valueTask.Task
-            day = valueTask.Day
+    return { mouth, year, day }
+}
 
-            const date = new Date(toDate(valueTask.Day))
-            mouth = date.getMonth()
-            year = date.getFullYear()
+export const scheduleMessage = async () => {
+    let taskValue: ITask | null = null
 
-        })
-        .catch((err) => {
-            console.error("Error na busca: ", err)
-        })
+    try {
+        taskValue = await TaskRepositories.getClosetsTask() as ITask
+        if (!taskValue) {
+            console.warn('No task found')
+            return
+        }
 
-
-    if (mouth === undefined || year === undefined) {
-        console.error('Mouth ou year não foram definidos corretamente')
-        return;
+    } catch (err) {
+        console.error('Error fetching task:', err)
+        return
     }
 
-    const job = schedule.scheduleJob(RuleScheduleJob(mouth, year), async () => {
+    const { mouth, year, day } = dateClosetsTask(taskValue!.Day)
+
+    const job = schedule.scheduleJob(ruleScheduleJob(mouth, year, day), async () => {
         try {
-            await sendMessageBot(day, name, task)
+            await sendMessageBot(taskValue!.Name, taskValue!.Day, taskValue!.Task)
             console.log("Mensagem agendada enviada")
+
+            await TaskRepositories.deleteTasks(taskValue!.id)
+            await scheduleMessage()
+
         } catch (error) {
             console.error('Erro ao enviar mensagem agendada:', error)
         }
     })
 
     console.log(job.nextInvocation())
-})()
+}
+
+scheduleMessage()

@@ -3,6 +3,7 @@ import fs from "fs"
 import { ITask } from "../interfaces/task"
 import { toDate } from "../utils/toDate"
 
+
 const filePath = path.join(__dirname, '../data/tasks.json')
 
 const getClosetsTask = () => {
@@ -20,7 +21,7 @@ const getClosetsTask = () => {
                 }
 
                 const tasks = JSON.parse(data)
-                
+
                 const closetsTask = findClosetsTask(tasks)
                 resolve(closetsTask)
             } catch (parseError) {
@@ -31,12 +32,46 @@ const getClosetsTask = () => {
     })
 }
 
+const deleteTasks = async (key: number) => {
+    return new Promise<void>((resolve, reject) => {
+        fs.readFile(filePath, 'utf8', (err, data) => {
+            if (err) {
+                console.error('Erro ao ler o arquivo:', err)
+                return reject(err)
+            }
+            
+            let jsonData: ITask[]
+
+            try {
+                jsonData = JSON.parse(data)
+            } catch (err) {
+                console.error('Erro ao parsear o JSON:', err)
+                return reject(err)
+            }
+
+            const index = jsonData.findIndex(item => item.id === key)
+            
+            jsonData.splice(index, 1)
+
+            fs.writeFile(filePath, JSON.stringify(jsonData, null, 2), 'utf8', (err) => {
+                if (err) {
+                    console.error('Erro ao escrever no arquivo:', err)
+                    return reject(err)
+                }
+
+                console.log('Dado deletado com sucesso!')
+                resolve()
+            })
+        })
+    })
+}
+
 const postTasks = async (tasks: ITask[]) => {
     fs.writeFile(filePath, JSON.stringify(tasks, null, 2), (err) => {
         if (err) {
             console.error('Error writing to file', err)
         } else {
-            console.log('Tasks saved successfully.')
+            console.log('Tarefa salva com sucesso!.')
         }
     })
 }
@@ -58,5 +93,6 @@ const findClosetsTask = (tasks: ITask[]): ITask | null => {
 
 export const TaskRepositories = {
     getClosetsTask,
+    deleteTasks,
     postTasks,
 }
