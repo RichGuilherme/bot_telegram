@@ -2,14 +2,14 @@ import TelegramBot from "node-telegram-bot-api"
 import schedule from 'node-schedule'
 import { TaskRepositories } from "../repository/tasks-repository"
 import { ITask } from "../interfaces/task"
-import { toDate } from "../utils/toDate"
+import { formatDate } from "../utils/formatDate"
 
 const token = process.env.TOKEN_TELEGRAM as string
 const bot = new TelegramBot(token, { polling: true })
 const chatId = process.env.CHATBOT_ID as string
 
-const sendMessageBot = async (name: string, day: string, task: string): Promise<TelegramBot.Message> => {
-    return await bot.sendMessage(chatId, `No próximo culto dia ${day}, ficará na projeção ${name} - ${task}`)
+const sendMessageBot = async (name: string, day: Date, task: string): Promise<TelegramBot.Message> => {
+    return await bot.sendMessage(chatId, `No próximo culto dia ${formatDate(day)}, ficará na projeção ${name} - ${task}`)
 }
 
 // Essa função serve para criar as regras de agendamento do scheduleJob, retornando um RecurrenceRule.
@@ -17,25 +17,25 @@ const ruleScheduleJob = (month: number, year: number, day: number): schedule.Rec
     const rule = new schedule.RecurrenceRule()
     let date = new Date()
 
-    rule.month = month - 1
+    rule.month = month 
+    rule.date = day + 1
     rule.year = year
-    rule.date = day
     rule.minute = 0
 
     if ((date.getDate() !== day) &&
-        (date.getDay() == 6) && 
+        (date.getDay() == 6) &&
         (date.getHours() < 17)
     ) {
         rule.hour = 18
     } else {
-        rule.hour = 11
+        rule.hour = 15
     }
 
     return rule
 }
 
-const dateClosetsTask = (value: string) => {
-    const date = new Date(toDate(value))
+const dateClosetsTask = async (taskDay: Date) => {
+    const date = new Date(taskDay)
     let mouth: number;
     let year: number;
     let day: number;
@@ -46,6 +46,7 @@ const dateClosetsTask = (value: string) => {
 
     return { mouth, year, day }
 }
+
 
 export const scheduleMessage = async () => {
     let taskValue: ITask | null = null
@@ -62,7 +63,7 @@ export const scheduleMessage = async () => {
         return
     }
 
-    const { mouth, year, day } = dateClosetsTask(taskValue!.Day)
+    const { mouth, year, day } = await dateClosetsTask(taskValue!.Day)
 
     const job = schedule.scheduleJob(ruleScheduleJob(mouth, year, day), async () => {
         try {
@@ -76,7 +77,7 @@ export const scheduleMessage = async () => {
             console.error('Erro ao enviar mensagem agendada:', error)
         }
     })
-
+    
     console.log(job.nextInvocation())
 }
 
