@@ -30,7 +30,7 @@ export const calendarService = {
                 id: index,
                 Name: taskValue.title || "",
                 Task: taskValue.notes || "",
-                Day: formatDate(taskValue.due?.split("T")[0] as string),
+                Day: new Date(taskValue.due as string)
             }))
 
             TaskRepositories.postTasks(tasks)

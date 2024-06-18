@@ -1,8 +1,6 @@
 import path from "path"
 import fs from "fs"
 import { ITask } from "../interfaces/task"
-import { toDate } from "../utils/toDate"
-
 
 const filePath = path.join(__dirname, '../data/tasks.json')
 
@@ -20,7 +18,7 @@ const getClosetsTask = () => {
                     return resolve(null)
                 }
 
-                const tasks = JSON.parse(data)
+                const tasks = JSON.parse(data) as ITask[]
 
                 const closetsTask = findClosetsTask(tasks)
                 resolve(closetsTask)
@@ -39,7 +37,7 @@ const deleteTasks = async (key: number) => {
                 console.error('Erro ao ler o arquivo:', err)
                 return reject(err)
             }
-            
+
             let jsonData: ITask[]
 
             try {
@@ -50,7 +48,7 @@ const deleteTasks = async (key: number) => {
             }
 
             const index = jsonData.findIndex(item => item.id === key)
-            
+
             jsonData.splice(index, 1)
 
             fs.writeFile(filePath, JSON.stringify(jsonData, null, 2), 'utf8', (err) => {
@@ -82,8 +80,8 @@ const findClosetsTask = (tasks: ITask[]): ITask | null => {
     const today = new Date()
 
     const sortedTasks = tasks.sort((a, b) => {
-        const dateA = toDate(a.Day).getTime()
-        const dateB = toDate(b.Day).getTime()
+        const dateA = new Date(a.Day).getTime()
+        const dateB = new Date(b.Day).getTime()
 
         return Math.abs(dateA - today.getTime()) - Math.abs(dateB - today.getTime())
     })
