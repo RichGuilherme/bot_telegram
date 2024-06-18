@@ -9,7 +9,7 @@ const router = Router()
 
 router.get('/auth', authController.login)
 router.get('/redirect', authController.redirect)
-router.get('/tasks', authMiddleware, calendarController.getEvents)
+router.get('/tasks', authMiddleware, calendarController.getTasks)
 
 // Bot Telegram
 
