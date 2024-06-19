@@ -4,7 +4,7 @@ import { ITask } from "../interfaces/task"
 
 const filePath = path.join(__dirname, '../data/tasks.json')
 
-const getClosetsTask = () => {
+const getClosestTask = () => {
     return new Promise((resolve, reject) => {
         fs.readFile(filePath, 'utf-8', (err, data) => {
             if (err) {
@@ -20,7 +20,7 @@ const getClosetsTask = () => {
 
                 const tasks = JSON.parse(data) as ITask[]
 
-                const closetsTask = findClosetsTask(tasks)
+                const closetsTask = findClosestTask(tasks)
                 resolve(closetsTask)
             } catch (parseError) {
                 console.error('Error parsing JSON:', parseError)
@@ -76,21 +76,21 @@ const postTasks = async (tasks: ITask[]) => {
 
 
 
-const findClosetsTask = (tasks: ITask[]): ITask | null => {
+const findClosestTask = (tasks: ITask[]): ITask[] | null => {
     const today = new Date()
 
     const sortedTasks = tasks.sort((a, b) => {
         const dateA = new Date(a.Day).getTime()
         const dateB = new Date(b.Day).getTime()
-
+        
         return Math.abs(dateA - today.getTime()) - Math.abs(dateB - today.getTime())
     })
 
-    return sortedTasks.length > 0 ? sortedTasks[0] : null // Primeira tarefa da lista
+    return sortedTasks
 }
 
 export const TaskRepositories = {
-    getClosetsTask,
+    getClosestTask,
     deleteTasks,
     postTasks,
 }
