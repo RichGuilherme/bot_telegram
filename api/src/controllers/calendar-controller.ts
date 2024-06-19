@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { calendarService } from '../services/calendar-service'
-import { scheduleMessage } from "../services/bot-service"
+import { scheduleMessage } from "../services/schedule-service"
 
 const googleTaskId = process.env.GOOGLE_TASK_ID as string
 

@@ -3,7 +3,7 @@ import { Router } from 'express'
 import { authController } from './controllers/oauth2-controller'
 import { authMiddleware } from './middleware/auth-middleware'
 import { calendarController } from './controllers/calendar-controller'
-import { botController } from './controllers/bot-controller'
+import { botController } from './controllers/botSchedule-controller'
 
 const router = Router()
 
