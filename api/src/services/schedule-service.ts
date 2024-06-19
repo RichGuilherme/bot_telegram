@@ -68,14 +68,14 @@ const ruleScheduleJob = (dayOfWeek: number, month: number, year: number, day: nu
 
             break;
 
-        case 1: // Terça
+        case 3: // Terça
             // Regra para aviso no sábado às 19h
             let ruleTuesday16 = new schedule.RecurrenceRule()
             ruleTuesday16.month = month
             ruleTuesday16.date = day
             ruleTuesday16.year = year
-            ruleTuesday16.hour = 15
-            ruleTuesday16.minute = 45
+            ruleTuesday16.hour = 16
+            ruleTuesday16.minute = 20
             rules.push(ruleTuesday16)
 
             // Regra para aviso no domingo às 13h
@@ -83,8 +83,8 @@ const ruleScheduleJob = (dayOfWeek: number, month: number, year: number, day: nu
             ruleTuesday17.month = month
             ruleTuesday17.date = day
             ruleTuesday17.year = year
-            ruleTuesday17.hour = 15
-            ruleTuesday17.minute = 47
+            ruleTuesday17.hour = 16
+            ruleTuesday17.minute = 25
             rules.push(ruleTuesday17)
             break;
 
