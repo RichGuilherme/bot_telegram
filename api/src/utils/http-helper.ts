@@ -1,4 +1,4 @@
-import { IHttpResponse } from "../interfaces/http-response-model"
+import { IHttpResponse } from "../models/http-response-model"
 
 
 export const ok = async (data: any): Promise<IHttpResponse> => {

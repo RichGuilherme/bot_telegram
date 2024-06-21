@@ -1,27 +1,26 @@
 import schedule from 'node-schedule'
 import { TaskRepositories } from "../repository/tasks-repository"
-import { ITask } from "../interfaces/task"
-import { sendMessageBot } from '../controllers/bot'
+import { ITask } from "../models/task"
+import { sendMessageBot } from './bot'
 import { getTaskDateDetails } from '../utils/date-utils'
 
 const scheduleJob = (rule: schedule.RecurrenceRule, task: ITask) => {
-    schedule.scheduleJob(rule, async () => {
+    const job = schedule.scheduleJob(rule, async () => {
         try {
             await sendMessageBot(task.Name, task.Day, task.Task)
             console.log("Mensagem agendada enviada")
 
             await TaskRepositories.deleteTasks(task.id)
+
         } catch (error) {
             console.error('Erro ao enviar mensagem agendada:', error)
         }
     })
-
-    console.log(`Scheduled job for task: ${task.Name} at ${rule.hour}:${rule.minute} on ${rule.date}/${rule.month}/${rule.year}`);
+    console.log(job.nextInvocation())
 }
 
 // Essa função serve para criar as regras de agendamento do scheduleJob. 
 // Ao sábados e domingo o agendamento é feito de forma diferente. Sendo duas tarefas, agendadas em tempos diferente.
-// 
 const ruleScheduleJob = (dayOfWeek: number, month: number, year: number, day: number): schedule.RecurrenceRule[] => {
     let rules: schedule.RecurrenceRule[] = []
 
@@ -68,34 +67,14 @@ const ruleScheduleJob = (dayOfWeek: number, month: number, year: number, day: nu
 
             break;
 
-        case 3: // Terça
-            // Regra para aviso no sábado às 19h
-            let ruleTuesday16 = new schedule.RecurrenceRule()
-            ruleTuesday16.month = month
-            ruleTuesday16.date = day
-            ruleTuesday16.year = year
-            ruleTuesday16.hour = 16
-            ruleTuesday16.minute = 20
-            rules.push(ruleTuesday16)
-
-            // Regra para aviso no domingo às 13h
-            let ruleTuesday17 = new schedule.RecurrenceRule()
-            ruleTuesday17.month = month
-            ruleTuesday17.date = day
-            ruleTuesday17.year = year
-            ruleTuesday17.hour = 16
-            ruleTuesday17.minute = 25
-            rules.push(ruleTuesday17)
-            break;
-
         default:
             // Regras padrões para os dias da semana
             let ruleDefault = new schedule.RecurrenceRule()
             ruleDefault.month = month
             ruleDefault.date = day
             ruleDefault.year = year
-            ruleDefault.hour = 15
-            ruleDefault.minute = 0
+            ruleDefault.hour = 19
+            ruleDefault.minute = 20
             rules.push(ruleDefault)
     }
 

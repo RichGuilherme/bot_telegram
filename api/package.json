@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start:dev": "tsx watch src/server.ts",
-    "build": "tsup src",
+    "build": "tsup src && mkdir -p dist/data && cp src/data/tasks.json dist/data/tasks.json",
     "start:node": "node dist/server.js"
   },
   "keywords": [],

@@ -7,7 +7,7 @@ const googleTaskId = process.env.GOOGLE_TASK_ID as string
 export const calendarController = {
     getTasks: async (req: Request, res: Response) => {
         try {
-            const tasks = await calendarService.Tasks(googleTaskId)
+            const tasks = await calendarService.getTaskGoogle(googleTaskId)
 
             await scheduleMessage()
 

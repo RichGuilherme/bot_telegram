@@ -1,16 +1,16 @@
 import { google } from 'googleapis'
 import { oauth2Client } from './auth-service'
-import { formatDate } from '../utils/formatDate'
 import { TaskRepositories } from '../repository/tasks-repository'
 
 
-export const calendarService = {
-    Tasks: async (taskListId: string) => {
-        const service = google.tasks({
-            version: 'v1',
-            auth: oauth2Client
-        })
+const service = google.tasks({
+    version: 'v1',
+    auth: oauth2Client
+})
 
+export const calendarService = {
+    getTaskGoogle: async (taskListId: string) => {
+    
         const res = await service.tasks.list({
             tasklist: taskListId,
         })

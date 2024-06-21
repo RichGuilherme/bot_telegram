@@ -1,8 +1,9 @@
 import path from "path"
 import fs from "fs"
-import { ITask } from "../interfaces/task"
+import { ITask } from "../models/task"
 
-const filePath = path.join(__dirname, '../data/tasks.json')
+const filePath = path.join(process.cwd(), 'dist/data/tasks.json')
+// const filePath = path.join(__dirname, '../data/tasks.json')
 
 const getClosestTask = () => {
     return new Promise((resolve, reject) => {
