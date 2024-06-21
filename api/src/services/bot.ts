@@ -30,4 +30,8 @@ export const onChatBot = async () => {
     })
 }
 
+bot.on('polling_error', (error) => {
+    console.log(error)
+})
+
 onChatBot() 
