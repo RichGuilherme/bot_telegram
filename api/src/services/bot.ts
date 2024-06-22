@@ -7,10 +7,8 @@ import { TaskRepositories } from "../repository/tasks-repository"
 const token = process.env.TOKEN_TELEGRAM as string
 const chatId = process.env.CHATBOT_ID as string
 
-const url = "https://bot-calendar.onrender.com"
-const bot = new TelegramBot(token, { webHook: true })
+const bot = new TelegramBot(token, { polling: true })
 
-bot.setWebHook(`${url}/bot${token}`)
 
 export const sendMessageBot = async (name: string, day: Date, task: string): Promise<void> => {
     await bot.sendMessage(chatId, `No próximo culto dia ${formatDate(day)}, ficará na projeção <b>${name}</b> - <b>${task}</b>`, { parse_mode: "HTML" })
@@ -32,7 +30,7 @@ export const onChatBot = async () => {
 }
 onChatBot()
 
-bot.on('webhook_error', (error) => {
+bot.on('polling_error', (error) => {
     console.log(error)
 })
 
