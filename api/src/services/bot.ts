@@ -16,15 +16,15 @@ export const sendMessageBot = async (name: string, day: Date, task: string): Pro
 
 export const onChatBot = async () => {
     let tasks: ITask[] = await TaskRepositories.getClosestTask() as ITask[]
-
     console.log(tasks)
+    
     bot.on('message', async (msg) => {
         let scale = "escala"
         if (msg.text?.toString().toLowerCase().indexOf(scale) === 0) {
-            await bot.sendMessage(msg.chat.id, "Escala do mês:")
 
-            tasks.forEach(task => {
-                bot.sendMessage(msg.chat.id, `<b style="color: red">${task.Name}</b>: \nDia <b>${formatDate(task.Day)}</b> - <b>${task.Task}</b>`, { parse_mode: "HTML" })
+            await bot.sendMessage(msg.chat.id, "Escala do mês:")
+            tasks.forEach(async task => {
+                await bot.sendMessage(msg.chat.id, `<b style="color: red">${task.Name}</b>: \nDia <b>${formatDate(task.Day)}</b> - <b>${task.Task}</b>`, { parse_mode: "HTML" })
             })
         }
     })
