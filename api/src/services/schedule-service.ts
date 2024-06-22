@@ -73,8 +73,8 @@ const ruleScheduleJob = (dayOfWeek: number, month: number, year: number, day: nu
             ruleDefault.month = month
             ruleDefault.date = day
             ruleDefault.year = year
-            ruleDefault.hour = 19
-            ruleDefault.minute = 20
+            ruleDefault.hour = 13
+            ruleDefault.minute = 0
             rules.push(ruleDefault)
     }
 

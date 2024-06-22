@@ -34,7 +34,8 @@ export const calendarService = {
             }))
 
             TaskRepositories.postTasks(tasks)
-
+             
+            return tasks
         } else {
             console.log('No task lists found.')
         }
