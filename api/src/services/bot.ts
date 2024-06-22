@@ -7,9 +7,9 @@ const token = process.env.TOKEN_TELEGRAM as string
 const bot = new TelegramBot(token, { polling: true })
 const chatId = process.env.CHATBOT_ID as string
 
-// const webhookUrl = 'https://YOUR_VERCEL_DEPLOYED_URL/api/telegram-bot'
+const webhookUrl = process.env.WEBHOOKURL as string
 
-// bot.setWebHook(webhookUrl)
+bot.setWebHook(`${webhookUrl}/bot${token}`)
 
 export const sendMessageBot = async (name: string, day: Date, task: string): Promise<void> => {
     await bot.sendMessage(chatId, `No próximo culto dia ${formatDate(day)}, ficará na projeção <b>${name}</b> - <b>${task}</b>`, { parse_mode: "HTML" })
