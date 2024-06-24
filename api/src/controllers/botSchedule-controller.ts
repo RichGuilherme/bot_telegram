@@ -2,7 +2,7 @@
 import { Request, Response } from "express"
 import { scheduleMessage } from "../services/schedule-service"
 
-export const botController = {
+export const botScheduleController = {
     sendMessage: async (req: Request, res: Response) => {
         try {
             scheduleMessage()

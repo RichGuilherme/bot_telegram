@@ -1,7 +1,8 @@
 import { Request, Response } from 'express'
 import { calendarService } from '../services/calendar-service'
 import { scheduleMessage } from "../services/schedule-service"
-import { onChatBot } from '../services/bot'
+import { botService } from '../services/bot-service'
+
 
 const googleTaskId = process.env.GOOGLE_TASK_ID as string
 
@@ -10,7 +11,7 @@ export const calendarController = {
         try {
             const tasks = await calendarService.getTaskGoogle(googleTaskId)
             await scheduleMessage()
-            await onChatBot()
+            await botService.handleChatBot()
 
             res.json(tasks)
         } catch (error) {

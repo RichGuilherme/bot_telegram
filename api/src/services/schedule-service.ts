@@ -1,13 +1,14 @@
 import schedule from 'node-schedule'
 import { TaskRepositories } from "../repository/tasks-repository"
 import { ITask } from "../models/task"
-import { sendMessageBot } from './bot'
+
 import { getTaskDateDetails } from '../utils/date-utils'
+import { botService } from './bot-service'
 
 const scheduleJob = (rule: schedule.RecurrenceRule, task: ITask) => {
-    const job = schedule.scheduleJob(rule, async () => {
+    schedule.scheduleJob(rule, async () => {
         try {
-            await sendMessageBot(task.Name, task.Day, task.Task)
+            await botService.sendMessageBot(task.Name, task.Day, task.Task)
             console.log("Mensagem agendada enviada")
 
             await TaskRepositories.deleteTasks(task.id)
@@ -16,7 +17,6 @@ const scheduleJob = (rule: schedule.RecurrenceRule, task: ITask) => {
             console.error('Erro ao enviar mensagem agendada:', error)
         }
     })
-    console.log(job.nextInvocation())
 }
 
 // Essa função serve para criar as regras de agendamento do scheduleJob. 
@@ -84,18 +84,11 @@ const ruleScheduleJob = (dayOfWeek: number, month: number, year: number, day: nu
 export const scheduleMessage = async () => {
     let taskValues: ITask[] = []
 
-    try {
-        taskValues = await TaskRepositories.getClosestTask() as ITask[]
-        if (!taskValues) {
-            console.warn('No task found')
-            return
-        }
-
-    } catch (err) {
-        console.error('Error fetching task:', err)
+    taskValues = await TaskRepositories.getClosestTask() as ITask[]
+    if (!taskValues) {
+        console.log('No task found')
         return
     }
-
 
     // Agrupar as tarefas pelo dia
     const tasksGroupedByDay: { [key: string]: ITask[] } = {}

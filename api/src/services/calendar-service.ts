@@ -17,6 +17,7 @@ export const calendarService = {
 
         const taskLists = res.data.items
 
+        // Pegar apenas tarefas desse mês
         if (taskLists && taskLists.length) {
             const currentDate = new Date()
             const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
