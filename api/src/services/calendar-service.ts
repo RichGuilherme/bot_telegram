@@ -1,6 +1,6 @@
 import { google } from 'googleapis'
 import { oauth2Client } from './auth-service'
-import { TaskRepositories } from '../repository/tasks-repository'
+import { tasksRepository } from '../repository/tasks-repository'
 
 
 const service = google.tasks({
@@ -10,7 +10,7 @@ const service = google.tasks({
 
 export const calendarService = {
     getTaskGoogle: async (taskListId: string) => {
-    
+
         const res = await service.tasks.list({
             tasklist: taskListId,
         })
@@ -34,8 +34,8 @@ export const calendarService = {
                 Day: new Date(taskValue.due as string)
             }))
 
-            TaskRepositories.postTasks(tasks)
-             
+            tasksRepository.postTask(tasks)
+
             return tasks
         } else {
             console.log('No task lists found.')

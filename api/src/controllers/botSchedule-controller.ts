@@ -5,9 +5,8 @@ import { scheduleMessage } from "../services/schedule-service"
 export const botScheduleController = {
     sendMessage: async (req: Request, res: Response) => {
         try {
-            scheduleMessage()
+            await scheduleMessage()
             res.send("Bot On")
-
         } catch (error) {
             console.error('Erro:', error)
         }

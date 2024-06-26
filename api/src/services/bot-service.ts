@@ -1,8 +1,9 @@
 import TelegramBot, { ChatId, Message }  from "node-telegram-bot-api"
 import { formatDate } from "../utils/formatDate"
 import { ITask } from "../models/task"
-import { TaskRepositories } from "../repository/tasks-repository"
+
 import https from 'https'
+import { tasksRepository } from "../repository/tasks-repository"
 
 const token = process.env.TOKEN_TELEGRAM as string
 const url = process.env.URL_NGROK
@@ -44,7 +45,7 @@ export const botService = {
     },
 
     handleChatBot: async (messageObj?: Message) => {
-        let tasks: ITask[] = await TaskRepositories.getClosestTask() as ITask[]
+        let tasks: ITask[] = await tasksRepository.getClosestTask() as ITask[]
         let messageText = messageObj?.text || ""
         let chatID: ChatId = messageObj?.chat?.id as number
 
@@ -66,6 +67,9 @@ export const botService = {
                     break;
 
                 case "proxCulto":
+                    if(true){
+
+                    }
                     await bot.sendMessage(chatID, `Proximo culto dia <b>${formatDate(tasks[0].Day)}</b>, está escalado <b>${tasks[0].Name}</b> - <b>${tasks[0].Task}</b>`, {parse_mode: "HTML"})
                     break;
 
