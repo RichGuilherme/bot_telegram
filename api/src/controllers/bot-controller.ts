@@ -7,7 +7,7 @@ export const botController = {
         try {
             res.send(await handle(req))
         } catch (error) {
-            console.error('Erro ao listar eventos:', error)      
+            console.error('Erro ao listar eventos webhook:', error)      
         }
     }
 }

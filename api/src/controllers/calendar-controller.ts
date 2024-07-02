@@ -15,8 +15,8 @@ export const calendarController = {
 
             res.json(tasks)
         } catch (error) {
-            console.error('Erro ao listar eventos:', error)
-            res.status(500).send('Erro ao listar eventos')
+            console.error('Erro ao listar tasks:', error)
+            res.status(500).send('Erro ao listar tasks')
         }
     }
 }
