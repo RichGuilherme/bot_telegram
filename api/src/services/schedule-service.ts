@@ -84,10 +84,6 @@ export const scheduleMessage = async () => {
     let taskValues: ITask[] = []
 
     taskValues = await tasksRepository.getClosestTask() as ITask[]
-    if (!taskValues) {
-        console.log('No task found')
-        return
-    }
 
     // Agrupar as tarefas pelo dia
     const tasksGroupedByDay: { [key: string]: ITask[] } = {}
