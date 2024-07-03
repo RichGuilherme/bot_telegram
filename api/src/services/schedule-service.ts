@@ -7,7 +7,7 @@ import { tasksRepository } from '../repository/tasks-repository'
 const scheduleJob = (rule: schedule.RecurrenceRule, task: ITask) => {
     schedule.scheduleJob(rule, async () => {
         try {
-            await botService.sendMessageBot(task.Name, task.Day, task.Task)
+            await botService.sendScheduledMessage(task.Name, task.Day, task.Task)
             console.log("Mensagem agendada enviada")
 
             await tasksRepository.deleteTasks(task.id)
