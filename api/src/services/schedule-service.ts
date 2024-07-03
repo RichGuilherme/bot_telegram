@@ -5,7 +5,7 @@ import { botService } from './bot-service'
 import { tasksRepository } from '../repository/tasks-repository'
 
 const scheduleJob = (rule: schedule.RecurrenceRule, task: ITask) => {
-    schedule.scheduleJob(rule, async () => {
+    const job = schedule.scheduleJob(rule, async () => {
         try {
             await botService.sendScheduledMessage(task.Name, task.Day, task.Task)
             console.log("Mensagem agendada enviada")
@@ -16,6 +16,8 @@ const scheduleJob = (rule: schedule.RecurrenceRule, task: ITask) => {
             console.error('Erro ao enviar mensagem agendada:', error)
         }
     })
+
+    console.log(job.nextInvocation())
 }
 
 // Essa função serve para criar as regras de agendamento do scheduleJob. 
@@ -84,7 +86,10 @@ export const scheduleMessage = async () => {
     let taskValues: ITask[] = []
 
     taskValues = await tasksRepository.getClosestTask() as ITask[]
-
+    if (!taskValues || taskValues.length === 0) {
+        console.error("Nenhuma tarefa encontrada")
+        return
+    }
     // Agrupar as tarefas pelo dia
     const tasksGroupedByDay: { [key: string]: ITask[] } = {}
     taskValues.forEach(task => {
