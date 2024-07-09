@@ -1,6 +1,7 @@
 import { google } from 'googleapis'
 import { oauth2Client } from './auth-service'
 import { tasksRepository } from '../repository/tasks-repository'
+import { ITask } from '../models/task'
 
 
 const service = google.tasks({
@@ -27,12 +28,13 @@ export const calendarService = {
                 const taskDate = taskValue.due ? new Date(taskValue.due.split("T")[0]) : null
 
                 return taskDate && taskDate >= firstDayOfMonth && taskDate <= lastDayOfMonth
-            }).map((taskValue, index) => ({
+            })
+            .map((taskValue, index) => ({
                 id: index,
                 Name: taskValue.title || "",
                 Task: taskValue.notes || "",
                 Day: new Date(taskValue.due as string)
-            }))
+            })) as ITask[]
 
             tasksRepository.postTask(tasks)
 

@@ -1,10 +1,8 @@
 export const getTaskDateDetails = (taskDay: Date) => {
-    const date = new Date(taskDay)
-  
-    let month = date.getMonth() 
-    let year = date.getFullYear()
-    let dayOfWeek = date.getUTCDay() 
-    let day = date.getUTCDate() 
+    let month = taskDay.getMonth() 
+    let year = taskDay.getFullYear()
+    let dayOfWeek = taskDay.getUTCDay() 
+    let day = taskDay.getUTCDate() 
 
     return { month, year, day, dayOfWeek }
 }

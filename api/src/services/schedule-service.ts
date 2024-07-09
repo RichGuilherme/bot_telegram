@@ -11,71 +11,67 @@ const scheduleJob = (rule: schedule.RecurrenceRule, task: ITask) => {
             console.log("Mensagem agendada enviada")
 
             await tasksRepository.deleteTasks(task.id)
-
+            
         } catch (error) {
             console.error('Erro ao enviar mensagem agendada:', error)
         }
     })
 
-    console.log(job.nextInvocation())
+    console.log(task, job.nextInvocation())
 }
 
 // Essa função serve para criar as regras de agendamento do scheduleJob. 
-// Aos sábados e domingos o agendamento é feito de forma diferente. Sendo duas tarefas, agendadas em tempos diferente.
-const ruleScheduleJob = (dayOfWeek: number, month: number, year: number, day: number): schedule.RecurrenceRule[] => {
+// domingo de manhã, noite e culto de eventos, terão o horário diferente de agendamento.
+const ruleScheduleJob = (eventType: string, month: number, year: number, day: number): schedule.RecurrenceRule[] => {
     let rules: schedule.RecurrenceRule[] = []
+    let eventPeriod: string = eventType.toLowerCase().match(/manhã|noite|evento/)?.[0] || ''
 
-    switch (dayOfWeek) {
-        case 6: // Sábado
-            // Regra para aviso às 11h
-            let rule11 = new schedule.RecurrenceRule()
-            rule11.month = month
-            rule11.date = day
-            rule11.year = year
-            rule11.hour = 11
-            rule11.minute = 0
-            rules.push(rule11)
-
-            // Regra para aviso às 13h
-            let rule13 = new schedule.RecurrenceRule()
-            rule13.month = month
-            rule13.date = day
-            rule13.year = year
-            rule13.hour = 13
-            rule13.minute = 0
-            rules.push(rule13)
-
+    switch (eventPeriod) {
+        case "manhã":
+            // Regra para aviso no sábado às 19h
+            let ruleSaturdayMorning = new schedule.RecurrenceRule()
+            ruleSaturdayMorning.month = month
+            ruleSaturdayMorning.date = day - 1
+            ruleSaturdayMorning.year = year
+            ruleSaturdayMorning.hour = 19
+            ruleSaturdayMorning.minute = 0
+            ruleSaturdayMorning.tz = "America/sao_paulo"
+            rules.push(ruleSaturdayMorning)
             break;
 
-        case 0: // Domingo
-            // Regra para aviso no sábado às 19h
-            let ruleSaturday19 = new schedule.RecurrenceRule()
-            ruleSaturday19.month = month
-            ruleSaturday19.date = day - 1
-            ruleSaturday19.year = year
-            ruleSaturday19.hour = 19
-            ruleSaturday19.minute = 0
-            rules.push(ruleSaturday19)
+        case "noite":
+            // Regra para aviso no domingo às 15h
+            let ruleSundayNight = new schedule.RecurrenceRule()
+            ruleSundayNight.month = month
+            ruleSundayNight.date = day
+            ruleSundayNight.year = year
+            ruleSundayNight.hour = 15
+            ruleSundayNight.minute = 0
+            ruleSundayNight.tz = "America/sao_paulo"
+            rules.push(ruleSundayNight)
+            break;
 
-            // Regra para aviso no domingo às 13h
-            let ruleSunday13 = new schedule.RecurrenceRule()
-            ruleSunday13.month = month
-            ruleSunday13.date = day
-            ruleSunday13.year = year
-            ruleSunday13.hour = 13
-            ruleSunday13.minute = 0
-            rules.push(ruleSunday13)
+        case "evento":
+            // Regra para aviso no sábado às 8h
+            let ruleSaturdayEvent = new schedule.RecurrenceRule()
+            ruleSaturdayEvent.month = month
+            ruleSaturdayEvent.date = day
+            ruleSaturdayEvent.year = year
+            ruleSaturdayEvent.hour = 8
+            ruleSaturdayEvent.minute = 0
+            ruleSaturdayEvent.tz = "America/sao_paulo"
+            rules.push(ruleSaturdayEvent)
 
             break;
 
         default:
-            // Regras padrões para os dias da semana
             let ruleDefault = new schedule.RecurrenceRule()
             ruleDefault.month = month
             ruleDefault.date = day
             ruleDefault.year = year
             ruleDefault.hour = 13
             ruleDefault.minute = 0
+            ruleDefault.tz = "America/sao_paulo"
             rules.push(ruleDefault)
     }
 
@@ -83,14 +79,14 @@ const ruleScheduleJob = (dayOfWeek: number, month: number, year: number, day: nu
 }
 
 export const scheduleMessage = async () => {
-    let taskValues: ITask[] = []
+    let taskValues: ITask[] = [];
 
     taskValues = await tasksRepository.getClosestTask() as ITask[]
     if (!taskValues || taskValues.length === 0) {
         console.error("Nenhuma tarefa encontrada")
         return
     }
-    // Agrupar as tarefas pelo dia
+
     const tasksGroupedByDay: { [key: string]: ITask[] } = {}
     taskValues.forEach(task => {
         const taskDay = String(task.Day).split('T')[0]
@@ -100,16 +96,19 @@ export const scheduleMessage = async () => {
         tasksGroupedByDay[taskDay].push(task)
     })
 
-    // Percorrer cada grupo de tarefas e distribuir entre os horários disponíveis
+
     for (const [taskDay, tasks] of Object.entries(tasksGroupedByDay)) {
-        const { month, year, day, dayOfWeek } = getTaskDateDetails(new Date(taskDay))
-        const rules = ruleScheduleJob(dayOfWeek, month, year, day)
+        const { month, year, day } = getTaskDateDetails(new Date(taskDay))
+
+        const rules = tasks.map(task => ruleScheduleJob(task.Task, month, year, day)[0])
 
         tasks.forEach((task, index) => {
             const rule = rules[index % rules.length]
+
             scheduleJob(rule, task)
         })
     }
+
 }
 
 scheduleMessage()
