@@ -9,8 +9,8 @@ const service = google.tasks({
     auth: oauth2Client
 })
 
-export const calendarService = {
-    getTaskGoogle: async (taskListId: string) => {
+export const googleTaskService = {
+    getTaskGoogle: async (taskListId: string): Promise<ITask[] | null> => {
 
         const res = await service.tasks.list({
             tasklist: taskListId,
@@ -29,18 +29,19 @@ export const calendarService = {
 
                 return taskDate && taskDate >= firstDayOfMonth && taskDate <= lastDayOfMonth
             })
-            .map((taskValue, index) => ({
-                id: index,
-                Name: taskValue.title || "",
-                Task: taskValue.notes || "",
-                Day: new Date(taskValue.due as string)
-            })) as ITask[]
+                .map((taskValue, index) => ({
+                    id: index,
+                    Name: taskValue.title || "",
+                    Task: taskValue.notes || "",
+                    Day: new Date(taskValue.due as string)
+                })) as ITask[]
 
             tasksRepository.postTask(tasks)
 
             return tasks
         } else {
-            console.log('No task lists found.')
+
+            return null
         }
     },
 }

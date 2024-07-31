@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { authController } from './controllers/oauth2-controller'
 import { authMiddleware } from './middleware/auth-middleware'
-import { calendarController } from './controllers/calendar-controller'
+import { googleTaskController } from './controllers/googleTask-controller'
 import { botScheduleController } from './controllers/botSchedule-controller'
 import { botController } from './controllers/bot-controller'
 
@@ -12,7 +12,7 @@ const weebhookEnd = "/webhook/" + token
 
 router.get('/auth', authController.login)
 router.get('/redirect', authController.redirect)
-router.get('/tasks', authMiddleware, calendarController.getTasks)
+router.get('/tasks', authMiddleware, googleTaskController.getTasks)
 
 // Bot Telegram
 

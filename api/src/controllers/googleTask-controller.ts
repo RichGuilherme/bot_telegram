@@ -1,15 +1,15 @@
 import { Request, Response } from 'express'
-import { calendarService } from '../services/calendar-service'
+import { googleTaskService } from '../services/googleTask-service'
 import { scheduleMessage } from "../services/schedule-service"
 import { botService } from '../services/bot-service'
 
 
 const googleTaskId = process.env.GOOGLE_TASK_ID as string
 
-export const calendarController = {
+export const googleTaskController = {
     getTasks: async (req: Request, res: Response) => {
         try {
-            const tasks = await calendarService.getTaskGoogle(googleTaskId)
+            const tasks = await googleTaskService.getTaskGoogle(googleTaskId)
             await scheduleMessage()
             await botService.handleChatBot()
 
