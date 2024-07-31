@@ -5,6 +5,7 @@ import { ITask } from "../models/task"
 import https from 'https'
 import { tasksRepository } from "../repository/tasks-repository"
 import { volunteedScheduleMessage } from "../utils/volunteerScheduleMessage"
+import chalk from "chalk"
 
 const token = process.env.TOKEN_TELEGRAM as string
 const url = process.env.URL_NGROK
@@ -14,7 +15,7 @@ var chatIDSchedule: number;
 
 
 export const botService = {
-    botInitWebhook: async (): Promise<string> => {
+    botInitWebhook: async (): Promise<void> => {
         const webhookUrl = `${url}/webhook/${token}`
         const apiUrl = `https://api.telegram.org/bot${token}/setWebhook?url=${webhookUrl}`
 
@@ -27,8 +28,8 @@ export const botService = {
                 })
 
                 res.on('end', () => {
-                    console.log('Webhook set:', data)
-                    resolve(data)
+                    console.log(chalk.bgGray('Webhook set: %s'), data)
+                    resolve()
                 })
             }).on('error', (err) => {
                 console.error('Error setting webhook:', err)
@@ -49,7 +50,7 @@ export const botService = {
         let tasks: ITask[] = await tasksRepository.getClosestTask() as ITask[]
         let messageText = messageObj?.text || ""
         let chatID: ChatId = messageObj?.chat?.id as number
-       
+
         if (messageText.charAt(0) === "/") {
             const command = messageText.slice(1)
 
@@ -66,7 +67,7 @@ export const botService = {
 
                 case "configSchedule":
                     chatIDSchedule = chatID;
-                    await bot.sendMessage(chatID, `O chat com agendamento foi definido: ${chatID}`)
+                    await bot.sendMessage(chatID, `O agendamento foi definido para o chat: ${chatID}`)
                     break;
 
                 case "proxCulto":
