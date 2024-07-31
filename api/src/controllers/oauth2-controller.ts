@@ -13,7 +13,7 @@ export const authController = {
         try {
 
             await authService.getToken(code)
-            res.send('Successfully logged in')
+            res.redirect('/')
         } catch (err) {
             console.error('Couldn\'t get token', err)
             res.send('Error')
