@@ -43,7 +43,21 @@ export const botService = {
             chatIDSchedule = Number(process.env.CHATBOT_ID)
         }
 
-        await bot.sendMessage(chatIDSchedule, `No próximo culto dia ${formatDate(day)}, ficará na projeção <b>${name}</b> - <b>${task}</b>`, { parse_mode: "HTML" })
+        const today = new Date()
+        const scheduledDate = new Date(day)
+
+        const isSameDay =
+            today.getDate() === scheduledDate.getUTCDate() &&
+            today.getMonth() === scheduledDate.getUTCMonth()
+
+
+        if (!isSameDay) {
+            await bot.sendMessage(chatIDSchedule, `Amanhã dia ${formatDate(day)}, ficará <b>${name}</b> - <b>${task}</b>`, { parse_mode: "HTML" })
+
+        } else {
+            await bot.sendMessage(chatIDSchedule, `Hoje dia ${formatDate(day)}, ficará <b>${name}</b> - <b>${task}</b>`, { parse_mode: "HTML" })
+        }
+
     },
 
     handleChatBot: async (messageObj?: Message) => {
@@ -68,6 +82,7 @@ export const botService = {
                 case "configSchedule":
                     chatIDSchedule = chatID;
                     await bot.sendMessage(chatID, `O agendamento foi definido para o chat: ${chatID}`)
+                    console.log('O agendamento foi definido!')
                     break;
 
                 case "proxCulto":
@@ -76,7 +91,7 @@ export const botService = {
                         break;
 
                     } else {
-                        await bot.sendMessage(chatID, `Proximo culto dia <b>${formatDate(tasks[0].Day)}</b>, está escalado <b>${tasks[0].Name}</b> - <b>${tasks[0].Task}</b>`, { parse_mode: "HTML" })
+                        await bot.sendMessage(chatID, `Próximo culto dia <b>${formatDate(tasks[0].Day)}</b>, está escalado <b>${tasks[0].Name}</b> - <b>${tasks[0].Task}</b>`, { parse_mode: "HTML" })
                         break;
                     }
 
