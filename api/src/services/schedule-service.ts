@@ -47,8 +47,8 @@ const ruleScheduleJob = (eventType: string, month: number, year: number, day: nu
             rule.minute = 0
             break
         default:
-            rule.hour = 16
-            rule.minute = 42
+            rule.hour = 13
+            rule.minute = 0
     }
 
     return rule
