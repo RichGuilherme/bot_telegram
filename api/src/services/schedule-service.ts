@@ -89,3 +89,5 @@ export const scheduleMessage = async () => {
         console.error(chalk.red("Erro ao agendar mensagens: %s"), error)
     }
 }
+
+scheduleMessage()
