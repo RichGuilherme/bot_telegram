@@ -1,5 +1,4 @@
 import TelegramBot, { ChatId, Message } from "node-telegram-bot-api"
-import { formatDate } from "../utils/formatDate"
 import { ITask } from "../models/task"
 
 import https from 'https'
@@ -38,25 +37,12 @@ export const botService = {
         })
     },
 
-    sendScheduledMessage: async (name: string, day: Date, task: string): Promise<void> => {
+    sendScheduledMessage: async (message: string): Promise<void> => {
         if (!chatIDSchedule) {
             chatIDSchedule = Number(process.env.CHATBOT_ID)
         }
-
-        const today = new Date()
-        const scheduledDate = new Date(day)
-
-        const isSameDay =
-            today.getDate() === scheduledDate.getUTCDate() &&
-            today.getMonth() === scheduledDate.getUTCMonth()
-
-
-        if (!isSameDay) {
-            await bot.sendMessage(chatIDSchedule, `Amanhã dia ${formatDate(day)}, ficará <b>${name}</b> - <b>${task}</b>`, { parse_mode: "HTML" })
-
-        } else {
-            await bot.sendMessage(chatIDSchedule, `Hoje dia ${formatDate(day)}, ficará <b>${name}</b> - <b>${task}</b>`, { parse_mode: "HTML" })
-        }
+        console.log(message)
+        await bot.sendMessage(chatIDSchedule, `${message}`, { parse_mode: "HTML" })
 
     },
 
@@ -85,19 +71,9 @@ export const botService = {
                     console.log('O agendamento foi definido!')
                     break;
 
-                case "proxCulto":
-                    if (tasks.length === 0) {
-                        await bot.sendMessage(chatID, `Escala não criada ou vazia!`)
-                        break;
-
-                    } else {
-                        await bot.sendMessage(chatID, `Próximo culto dia <b>${formatDate(tasks[0].Day)}</b>, está escalado <b>${tasks[0].Name}</b> - <b>${tasks[0].Task}</b>`, { parse_mode: "HTML" })
-                        break;
-                    }
-
                 case "help":
                     await bot.sendMessage(chatID, `
-                    Comandos bot: \n- /escala: retornar toda escala \n- /configSchedule: configura o chat para receber notificações \n- /proxCulto: mostra quem ficará no próximo culto`)
+                    Comandos bot: \n- /escala: retornar toda escala \n- /configSchedule: configura o chat para receber notificações`)
                     break;
 
                 default:
