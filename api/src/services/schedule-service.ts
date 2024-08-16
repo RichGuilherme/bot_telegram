@@ -22,15 +22,15 @@ const createRule = (period: string, day: number, month: number, year: number): s
             break
         case "noite":
             rule.hour = 15
-            rule.minute = 30
+            rule.minute = 0
             break
         case "evento":
             rule.hour = 10
             rule.minute = 0
             break
         default:
-            rule.hour = 18
-            rule.minute = 40
+            rule.hour = 16
+            rule.minute = 0
     }
 
     return rule
