@@ -5,3 +5,5 @@ export interface ITask {
     Task: string
     Day: Date
 }
+
+export type TaskType = "projeção" | "transmissão"
